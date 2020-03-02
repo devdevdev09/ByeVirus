@@ -1,5 +1,6 @@
 {
     "URL" : "http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13&ncvContSeq=&contSeq=&board_id=&gubun=",
     "URL_TOTAL" : "http://ncov.mohw.go.kr/index_main.jsp",
-    "WEBHOOKURL" : "SLACK_WEBHOOK_URL"
+    "WEBHOOKURL" : "SLACK_WEBHOOK_URL",
+    "FILE_PATH" : "file.txt"
 }

@@ -14,7 +14,7 @@ const column = ["증감", "계", "사망"];
 
 const summary = ["합계", "서울", "대구", "경남", "경북"];
 
-const fileName = "file.txt";
+const fileName = config.FILE_PATH;
 const fileExt = "utf8";
 
 
