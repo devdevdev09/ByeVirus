@@ -14,6 +14,9 @@ const column = ["증감", "계", "사망"];
 
 const summary = ["합계", "서울", "대구", "경남", "경북"];
 
+const fileName = "file.txt";
+const fileExt = "utf8";
+
 
 const updateCheck = function(time){
     const fileTime = fileRead();
@@ -26,22 +29,91 @@ const updateCheck = function(time){
 }
 
 const fileRead = function(){
-    const fileData = fs.readFileSync("file.txt", "utf8");
+    const fileData = fs.readFileSync(fileName, fileExt);
     return fileData;
 }
 
-const fileWrite = function(time){
-    fs.appendFileSync("file.txt", time, "utf8");
+const jsonFileRead = function(){
+    const fileData = fs.readFileSync(fileName, fileExt);
+    const data = JSON.parse(fileData);
+    return data;
+}
+
+const fileWrite = function(data){
+    fs.writeFileSync(fileName, data, fileExt);
+}
+
+const getCoronaStatusTotal = function(callBack){
+    request(targetTotal, function(error, response, body){
+
+        if(response.statusCode != 200){
+            console.log(logTime + "status 200 ");
+            return;
+        }
+        const nowTime = new Date().toFormat("YYYY-MM-DD HH24:MI:SS");
+        const logTime = "[" + nowTime + "] : ";
+        
+        const $ = cheerio.load(body);
+
+        const col = [];
+        const num = [];
+
+        $(".main > .m_row > .co_cur > ul > li").each(function(i){
+            col[i] = $(this).children("span").text();
+            num[i] = $(this).children("a").text();
+        });
+
+        const nowData = {
+            "date" : nowTime,
+            "count" : {
+                "total"   : Number(num[0].trim().replace(",", "").replace("명","")),
+                "release" : Number(num[1].trim().replace(",", "").replace("명","")),
+                "death"   : Number(num[2].trim().replace(",", "").replace("명",""))
+            }
+        }
+
+        const lastdata = jsonFileRead();
+        
+        if(lastdata.length > 0){
+            const lastCount = lastdata[lastdata.length-1].count.total;
+            const nowCount = nowData.count.total;
+    
+            if(lastCount == nowCount){
+                console.log(logTime + "no update");
+                return;
+            }else{
+                callBack(nowData);
+                lastdata.push(nowData);
+                fileWrite(JSON.stringify(lastdata));
+            }
+        }else{
+            callBack(nowData);
+            lastdata.push(nowData);
+            fileWrite(JSON.stringify(lastdata));
+        }
+    })
 }
 
 const getCoronaStatusByLocation = function(callBack){
     request(target, function(error, response, body){
+        const logTime = "[" + new Date() + "] :";
+        if(response.statusCode != "200"){
+            console.log(logTime + "response not 200");
+            return;
+        }else{
+            console.log(logTime + "response not 200");
+            return;
+        }
+        console.log(response.statusCode);
         const $ = cheerio.load(body);
         
         const time = $('.timetable .info').text().trim();
         
         if(!updateCheck(time)){
-            console.log("업뎃안됨");
+            console.log(logTile + "업뎃안됨");
+            return;
+        }else{
+            console.log(logTile + "업뎃안됨");
             return;
         }
 
@@ -72,22 +144,28 @@ const getCoronaStatusByLocation = function(callBack){
             }
         });
 
-        fileWrite(time);
 
-        callBack(summary_msg);
+        fileWrite({
+            time : time,
+            text : total_msg
+        });
+
+        // callBack(summary_msg);
     });
 };
 
 const slack = new Slack();
 slack.setWebhook(webhookUri);
 
-const send = function(msg){
+const send = function(json){
+    const msg = `[${json.date}] :  전체 확진 : ${json.count.total}, 격리 해제 : ${json.count.release}, 사망 : ${json.count.death}`;
     slack.webhook({
-        "username":"byeVirus",
+        "username" : "byeVirus",
         "text" : msg,
     }, function(err, response){
 
     });
 };
 
-getCoronaStatusByLocation(send);
+getCoronaStatusTotal(send);
+// TODO :: 전체 통계 만들기
