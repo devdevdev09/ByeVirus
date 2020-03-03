@@ -63,16 +63,28 @@ const getCoronaStatusTotal = function(callBack){
             num[i] = $(this).children("a").text();
         });
 
+        const lastdata = jsonFileRead();
+
+        const now_total = Number(num[0].trim().replace(",", "").replace("명",""));
+        const now_release = Number(num[1].trim().replace(",", "").replace("명",""));
+        const now_death = Number(num[2].trim().replace(",", "").replace("명",""));
+        let now_increase = 0;
+        
+        if(lastdata.length > 0){
+            now_increase = Number(num[0].trim().replace(",", "").replace("명","")) - lastdata[lastdata.length-1].count.total;
+        }else{
+            now_increase = 0;
+        }
+
         const nowData = {
             "date" : nowTime,
             "count" : {
-                "total"   : Number(num[0].trim().replace(",", "").replace("명","")),
-                "release" : Number(num[1].trim().replace(",", "").replace("명","")),
-                "death"   : Number(num[2].trim().replace(",", "").replace("명",""))
+                "total"    : now_total,
+                "release"  : now_release,
+                "death"    : now_death,
+                "increase" : now_increase
             }
         }
-
-        const lastdata = jsonFileRead();
         
         if(lastdata.length > 0){
             const lastCount = lastdata[lastdata.length-1].count.total;
@@ -158,7 +170,8 @@ const slack = new Slack();
 slack.setWebhook(webhookUri);
 
 const send = function(json){
-    const msg = `[${json.date}] :  전체 확진 : ${json.count.total}, 격리 해제 : ${json.count.release}, 사망 : ${json.count.death}`;
+    const count = json.count;
+    const msg = `[${json.date}] :  전체 확진 : ${count.total}, 격리 해제 : ${count.release}, 사망 : ${count.death}, 증감 : ${count.increase}`;
     slack.webhook({
         "username" : "byeVirus",
         "text" : msg,
