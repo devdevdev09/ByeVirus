@@ -34,8 +34,14 @@ const fileRead = function(){
 }
 
 const jsonFileRead = function(){
-    const fileData = fs.readFileSync(fileName, fileExt);
+    let fileData = fs.readFileSync(fileName, fileExt);
+    
+    if(!fileData){
+        fileData = "[]";
+    }
+    
     const data = JSON.parse(fileData);
+
     return data;
 }
 
