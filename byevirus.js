@@ -39,7 +39,7 @@ const jsonFileRead = function(){
     if(!fileData){
         fileData = "[]";
     }
-    
+
     const data = JSON.parse(fileData);
 
     return data;
@@ -100,11 +100,13 @@ const getCoronaStatusTotal = function(callBack){
                 console.log(logTime + "no update");
                 return;
             }else{
+                console.log(logTime + "update");
                 callBack(nowData);
                 lastdata.push(nowData);
                 fileWrite(JSON.stringify(lastdata));
             }
         }else{
+            console.log(logTime + "update");
             callBack(nowData);
             lastdata.push(nowData);
             fileWrite(JSON.stringify(lastdata));
