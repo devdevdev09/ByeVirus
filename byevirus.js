@@ -110,7 +110,9 @@ const getCoronaStatusTotal = function(callBack){
     
             if(lastCount == nowCount){
                 console.log(logTime + "no update");
-                callBack(nowData);
+                if(ENV_DEV_TYPES.includes(ENV)){
+                    callBack(nowData);
+                }
                 return;
             }
         }
