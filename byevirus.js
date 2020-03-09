@@ -17,6 +17,9 @@ const summary = ["합계", "서울", "대구", "경남", "경북"];
 const fileName = config.FILE_PATH;
 const fileExt = "utf8";
 
+const ENV = process.argv[2];
+const ENV_DEV_TYPES = ["dev", "local", "console", "log"];
+
 
 const updateCheck = function(time){
     const fileTime = fileRead();
@@ -107,19 +110,15 @@ const getCoronaStatusTotal = function(callBack){
     
             if(lastCount == nowCount){
                 console.log(logTime + "no update");
-                return;
-            }else{
-                console.log(logTime + "update");
                 callBack(nowData);
-                lastdata.push(nowData);
-                fileWrite(JSON.stringify(lastdata));
+                return;
             }
-        }else{
-            console.log(logTime + "update");
-            callBack(nowData);
-            lastdata.push(nowData);
-            fileWrite(JSON.stringify(lastdata));
         }
+
+        console.log(logTime + "update");
+        callBack(nowData);
+        lastdata.push(nowData);
+        fileWrite(JSON.stringify(lastdata));
     })
 }
 
@@ -188,13 +187,18 @@ slack.setWebhook(webhookUri);
 
 const send = function(json){
     const count = json.count;
-    const msg = `[${json.date}] :  전체 확진 : ${count.total}, 격리 해제 : ${count.release}, 사망 : ${count.death}, 증감 : ${count.increase}`;
-    slack.webhook({
-        "username" : "byeVirus",
-        "text" : msg,
-    }, function(err, response){
+    const msg = `[${json.date}] : 전체 확진 : ${count.total}, 격리 해제 : ${count.release}, 사망 : ${count.death}, 증감 : ${count.increase}`;
 
-    });
+    if(ENV_DEV_TYPES.includes(ENV)){
+        console.log(msg);
+    }else{
+        slack.webhook({
+            "username" : "byeVirus",
+            "text" : msg,
+        }, function(err, response){
+
+        });
+    }
 };
 
 getCoronaStatusTotal(send);
