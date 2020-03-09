@@ -50,10 +50,19 @@ const fileWrite = function(data){
 }
 
 const getCoronaStatusTotal = function(callBack){
+    const TARGET_ELEMENT = "ul.liveNum > li";
+    const COL_ELEMENT = "strong.tit";
+    const NUM_ELEMENT = "span.num";
+    const COL_NUM = {
+        "전체" : 0, 
+        "완치" : 1, 
+        "사망" : 3
+    };
+
     request(targetTotal, function(error, response, body){
 
         if(response.statusCode != 200){
-            console.log(logTime + "status 200 ");
+            console.log(logTime + "!(status 200) ");
             return;
         }
         const nowTime = new Date().toFormat("YYYY-MM-DD HH24:MI:SS");
@@ -64,20 +73,20 @@ const getCoronaStatusTotal = function(callBack){
         const col = [];
         const num = [];
 
-        $(".main > .m_row > .co_cur > ul > li").each(function(i){
-            col[i] = $(this).children("span").text();
-            num[i] = $(this).children("a").text();
+        $(TARGET_ELEMENT).each(function(i){
+            col[i] = $(this).children(COL_ELEMENT).text();
+            num[i] = $(this).children(NUM_ELEMENT).text().replace(/[^0-9]/g,"");
         });
 
         const lastdata = jsonFileRead();
 
-        const now_total = Number(num[0].trim().replace(",", "").replace("명",""));
-        const now_release = Number(num[1].trim().replace(",", "").replace("명",""));
-        const now_death = Number(num[2].trim().replace(",", "").replace("명",""));
+        const now_total = num[COL_NUM["전체"]];
+        const now_release = num[COL_NUM["완치"]];
+        const now_death = num[COL_NUM["사망"]];
         let now_increase = 0;
         
         if(lastdata.length > 0){
-            now_increase = Number(num[0].trim().replace(",", "").replace("명","")) - lastdata[lastdata.length-1].count.total;
+            now_increase = num[0] - lastdata[lastdata.length-1].count.total;
         }else{
             now_increase = 0;
         }
