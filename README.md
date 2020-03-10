@@ -11,6 +11,6 @@
 > npm ls --depth=0
 :설치 모듈 확인
 
-> node node .\byevirus.js
-: 실행 "[github ids...]"
+> node node .\byevirus.js [dev,local,console,log]
+: 실행 "argv 있으면 console에서만 실행"
 ```
