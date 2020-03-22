@@ -110,9 +110,11 @@ const getCoronaStatusTotal = function(callBack){
     
             if(lastCount == nowCount){
                 console.log(logTime + "no update");
-                if(ENV_DEV_TYPES.includes(ENV)){
+
+                if(!webhookUri){
                     callBack(nowData);
                 }
+                
                 return;
             }
         }
@@ -191,7 +193,7 @@ const send = function(json){
     const count = json.count;
     const msg = `[${json.date}] : 전체 확진 : ${count.total}, 격리 해제 : ${count.release}, 사망 : ${count.death}, 증감 : ${count.increase}`;
 
-    if(ENV_DEV_TYPES.includes(ENV)){
+    if(!webhookUri){
         console.log(msg);
     }else{
         slack.webhook({
