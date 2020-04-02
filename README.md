@@ -14,3 +14,9 @@
 > node node .\byevirus.js [dev,local,console,log]
 : 실행 "argv 있으면 console에서만 실행"
 ```
+
+- 2020-04-02
+    - NaN 체크 추가
+
+### TODO list
+- 출력, 전송 함수 분리
