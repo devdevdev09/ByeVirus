@@ -87,6 +87,11 @@ const getCoronaStatusTotal = function(callBack){
         const now_release = num[COL_NUM["완치"]];
         const now_death = num[COL_NUM["사망"]];
         let now_increase = 0;
+
+        if(Number.isNaN(Number(now_total)) || Number.isNaN(Number(now_release)) || Number.isNaN(Number(now_death))){
+            console.log("Number is NaN");
+            return;
+        }
         
         if(lastdata.length > 0){
             now_increase = num[0] - lastdata[lastdata.length-1].count.total;
