@@ -63,13 +63,13 @@ const getCoronaStatusTotal = function(callBack){
     };
 
     request(targetTotal, function(error, response, body){
+        const nowTime = new Date().toFormat("YYYY-MM-DD HH24:MI:SS");
+        const logTime = "[" + nowTime + "] : ";
 
         if(response.statusCode != 200){
             console.log(logTime + "!(status 200) ");
             return;
         }
-        const nowTime = new Date().toFormat("YYYY-MM-DD HH24:MI:SS");
-        const logTime = "[" + nowTime + "] : ";
         
         const $ = cheerio.load(body);
 
